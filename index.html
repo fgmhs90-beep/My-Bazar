@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff5a00">
+<title>My Bazar — Online Shop</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f4f5f7;color:#17202a;font-family:Arial,"Noto Sans Bengali",sans-serif}
+button,input,textarea,select{font:inherit}.app{max-width:760px;margin:auto;background:#f4f5f7;min-height:100vh;padding-bottom:82px}
+.top{position:sticky;top:0;z-index:20;background:#ff5a00;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:9px;box-shadow:0 2px 10px #0002}
+.logo{font-size:23px;font-weight:800;margin-right:auto}.logo b{color:#102a43}.topbtn{border:0;background:#ffffff22;color:#fff;border-radius:11px;padding:9px 11px;font-size:19px;position:relative}.badge{position:absolute;right:-3px;top:-4px;background:#102a43;border-radius:10px;font-size:10px;padding:2px 5px}
+.search{display:flex;gap:7px;background:#fff;padding:10px}.search input{flex:1;border:1px solid #ddd;border-radius:9px;padding:11px}.search button{border:0;background:#eee;border-radius:9px;padding:0 13px}
+.hero{margin:12px;border-radius:20px;padding:25px 20px;background:linear-gradient(135deg,#fff0e6,#ffd0ad);display:flex;align-items:center;justify-content:space-between;overflow:hidden}
+.hero small{color:#e84d00;font-weight:700}.hero h1{font-size:38px;line-height:1.08;margin:8px 0}.hero p{margin:8px 0 15px}.cta{border:0;background:#ff5a00;color:white;border-radius:10px;padding:12px 16px;font-weight:700}.deal{font-size:72px;text-align:center}.deal span{display:block;background:#102a43;color:#fff;border-radius:20px;padding:5px 9px;font-size:10px}
+.section{background:#fff;margin:10px 0;padding:18px 14px}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.title h2{margin:0;font-size:21px}.muted{color:#777;font-size:13px}.chips{display:flex;gap:8px;overflow:auto}.chip{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:20px;padding:9px 13px}.chip.active{background:#ff5a00;color:#fff;border-color:#ff5a00}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.card{border:1px solid #eee;border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 2px 8px #00000008}.pic{height:145px;background:#fff1e8;display:grid;place-items:center;font-size:60px}.pic img{width:100%;height:100%;object-fit:contain}.info{padding:10px}.info h3{font-size:15px;margin:0 0 6px;min-height:35px}.price{color:#f45100;font-weight:800;font-size:18px}.old{text-decoration:line-through;color:#999;font-size:12px;margin-left:5px}.stock{font-size:11px;color:#777}.buy{width:100%;border:0;border-radius:8px;background:#ff5a00;color:#fff;padding:10px;margin-top:8px;font-weight:700}.buy:disabled{background:#bbb}
+footer{background:#ff5a00;color:#fff;padding:30px 18px 40px}footer h2{margin-top:0}footer b{color:#102a43}.bottom{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:70px;background:#fff;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom)}.bottom button{border:0;background:transparent;color:#555;font-size:22px}.bottom small{display:block;font-size:10px;margin-top:2px}
+.modal{position:fixed;inset:0;background:#0008;z-index:40;display:flex;align-items:flex-end}.sheet{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:20px 20px 0 0;padding:20px 15px;position:relative;margin:auto auto 0}.close{position:absolute;right:13px;top:12px;border:0;background:#eee;border-radius:50%;width:32px;height:32px}.row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:12px 0}.qty button{border:1px solid #ddd;background:#fff;border-radius:6px}.form input,.form textarea,.form select{width:100%;border:1px solid #ddd;border-radius:8px;padding:11px;margin:5px 0}.form textarea{height:85px}.total{text-align:right;font-size:20px;font-weight:800;margin:14px 0}.primary{width:100%;background:#ff5a00;color:#fff;border:0;border-radius:9px;padding:12px;font-weight:700}
+.adminHead{background:#102a43;color:#fff;padding:16px;border-radius:12px;margin-bottom:12px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#f7f7f7;padding:13px;border-radius:10px}.adminTabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.adminTabs button{border:0;background:#eee;border-radius:8px;padding:9px 12px;white-space:nowrap}.adminTabs button.on{background:#ff5a00;color:#fff}.adminBox{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px;margin:8px 0}.adminBox input,.adminBox textarea,.adminBox select{width:100%;padding:9px;margin:4px 0;border:1px solid #ddd;border-radius:7px}.adminBox button{border:0;border-radius:7px;padding:9px 12px;background:#ff5a00;color:#fff}.order{border-bottom:1px solid #eee;padding:12px 0}.danger{background:#d93025!important}
+.empty{text-align:center;color:#777;padding:25px}
+.messageList{display:flex;flex-direction:column;gap:8px;margin:12px 0}.msg{padding:10px 12px;border-radius:14px;max-width:82%;background:#f1f1f1}.msg.mine{margin-left:auto;background:#ffe6d8}.msg small{display:block;color:#777;margin-top:3px}.chatRow{display:flex;gap:7px}.chatRow input{flex:1;padding:11px;border:1px solid #ddd;border-radius:9px}.chatRow button{border:0;background:#ff5a00;color:#fff;border-radius:9px;padding:10px 14px}.messageCard{border:1px solid #eee;border-radius:10px;padding:10px;margin:7px 0}.messageCard button{margin-top:7px}.hide{display:none!important}
+.mediaGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}.mediaThumb{border:1px solid #eee;border-radius:9px;overflow:hidden;background:#fff}.mediaThumb img,.mediaThumb video{width:100%;height:90px;object-fit:cover;display:block}.mediaCount{font-size:11px;color:#777;margin-top:4px}.copyRow{display:flex;gap:7px;align-items:center}.copyRow input{flex:1;background:#f7f7f7}.copyBtn{border:0;background:#102a43;color:#fff;border-radius:8px;padding:10px 12px}.payBox{background:#fff7f0;border:1px solid #ffd7bf;border-radius:12px;padding:12px;margin:10px 0}.payMethod{font-weight:800;color:#e84d00}.sendLabel{font-size:13px;color:#555;margin:4px 0 7px}.minPay{font-weight:800;color:#d93025}.fileNote{font-size:11px;color:#777}.productMedia{margin-top:8px}.productMedia img,.productMedia video{width:100%;max-height:240px;object-fit:contain;border-radius:10px;background:#fff}.thumbRow{display:flex;gap:6px;overflow:auto;margin-top:7px}.thumbRow img{width:54px;height:54px;object-fit:cover;border-radius:7px;border:1px solid #ddd;flex:0 0 auto}.
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,1fr)}.pic{height:165px}.hero h1{font-size:46px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="logo">🛍️ My<span>Bazar</span></div>
+  <button class="topbtn" onclick="toggleSearch()">⌕</button>
+  <button class="topbtn" onclick="openCart()">🛒<i class="badge" id="cartCount">0</i></button>
+  <button class="topbtn" onclick="openMessages()">💬</button>
+</header>
+
+<div id="searchWrap" class="search hide">
+  <input id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
+  <button onclick="toggleSearch()">✕</button>
+</div>
+
+<section class="hero">
+  <div>
+    <small>🔥 আজকের সেরা অফার</small>
+    <h1>সেরা পণ্য,<br>সেরা দামে</h1>
+    <p>সহজে অর্ডার করুন, দ্রুত ডেলিভারি নিন।</p>
+    <button class="cta" onclick="goShop()">এখনই শপ করুন →</button>
+  </div>
+  <div class="deal">🛍️<span>BEST<br>DEALS</span></div>
+</section>
+
+<section class="section">
+  <div class="title"><h2>ক্যাটাগরি</h2><span class="muted" id="catCount"></span></div>
+  <div class="chips" id="categories"></div>
+</section>
+
+<section class="section" id="shop">
+  <div class="title"><h2>জনপ্রিয় পণ্য</h2><span class="muted" id="productCount"></span></div>
+  <div class="grid" id="products"></div>
+</section>
+
+<footer>
+  <h2>🛍️ My<span>Bazar</span></h2>
+  <p>বাংলাদেশে সহজ ও সুবিধাজনক অনলাইন শপিং।</p>
+  <p>📞 01334966754</p>
+  <p>✉️ mrmhs999z@gmail.com</p>
+</footer>
+
+<nav class="bottom">
+  <button onclick="scrollTo({top:0,behavior:'smooth'})">⌂<small>হোম</small></button>
+  <button onclick="goShop()">▦<small>শপ</small></button>
+  <button onclick="openCart()">🛒<small>কার্ট</small></button>
+  <button onclick="openMessages()">💬<small>মেসেজ</small></button>
+  <button onclick="openOrders()">🧾<small>অর্ডার</small></button>
+  <button onclick="openAdmin()">⚙<small>অ্যাডমিন</small></button>
+</nav>
+
+<div id="cartModal" class="modal hide"><div class="sheet">
+  <button class="close" onclick="closeModal('cartModal')">✕</button><h2>🛒 আপনার কার্ট</h2>
+  <div id="cartItems"></div><div class="total" id="cartTotal"></div><div id="checkout"></div>
+</div></div>
+
+<div id="ordersModal" class="modal hide"><div class="sheet">
+  <button class="close" onclick="closeModal('ordersModal')">✕</button><h2>🧾 আমার অর্ডার</h2><div id="orders"></div>
+</div></div>
+
+<div id="messagesModal" class="modal hide"><div class="sheet">
+  <button class="close" onclick="closeModal('messagesModal')">✕</button>
+  <h2>💬 মেসেজ</h2>
+  <div id="messageArea"></div>
+</div></div>
+
+<div id="adminModal" class="modal hide"><div class="sheet">
+  <button class="close" onclick="closeModal('adminModal')">✕</button>
+  <div class="adminHead"><h2 style="margin:0">My Bazar Admin</h2><small>Local demo admin panel</small></div>
+  <div class="adminTabs">
+    <button id="tabDash" class="on" onclick="adminTab('dash')">Dashboard</button>
+    <button id="tabProd" onclick="adminTab('prod')">Product Add</button>
+    <button id="tabOrd" onclick="adminTab('ord')">Orders</button>
+    <button id="tabMsg" onclick="adminTab('msg')">Messages</button>
+  </div>
+  <div id="adminDash"></div><div id="adminProd" class="hide"></div><div id="adminOrd" class="hide"></div><div id="adminMsg" class="hide"></div>
+</div></div>
+
+<script>
+const KEY='mybazar_complete_v1';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ products:[
+  {id:1,name:'স্মার্ট ওয়াচ',cat:'ঘড়ি',price:850,old:1100,stock:12,emoji:'⌚'},
+  {id:2,name:'স্পোর্টস জুতা',cat:'জুতা',price:1250,old:1600,stock:8,emoji:'👟'},
+  {id:3,name:'কিচেন ফিটিং',cat:'কিচেন',price:650,old:850,stock:15,emoji:'🍳'},
+  {id:4,name:'ওয়্যারলেস হেডফোন',cat:'গ্যাজেট',price:990,old:1290,stock:10,emoji:'🎧'}
+ ],
+ cart:[],orders:[]
+};
+let activeCat='সব';
+const customerId=localStorage.getItem('mybazar_customer_id')||crypto.randomUUID();
+localStorage.setItem('mybazar_customer_id',customerId);
+const socket=window.io?io():null;
+if(socket) socket.emit('customer_join',customerId);
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+const money=n=>'৳'+Number(n).toLocaleString('bn-BD');
+
+function render(){
+ const cats=['সব',...new Set(state.products.map(p=>p.cat))];
+ document.getElementById('catCount').textContent=cats.length+'টি';
+ document.getElementById('categories').innerHTML=cats.map(c=>`<button class="chip ${c===activeCat?'active':''}" onclick="filterCat('${esc(c)}')">${c}</button>`).join('');
+ renderProducts();
+ updateCartCount();
+}
+function renderProducts(){
+ const q=(document.getElementById('search').value||'').toLowerCase();
+ const list=state.products.filter(p=>(activeCat==='সব'||p.cat===activeCat)&&(p.name+p.cat).toLowerCase().includes(q));
+ document.getElementById('productCount').textContent=list.length+'টি পণ্য';
+ document.getElementById('products').innerHTML=list.length?list.map(p=>`
+ <article class="card"><div class="pic" onclick="openProduct(${p.id})">${(p.images&&p.images.length)?`<img src="${p.images[0]}">`:p.image?`<img src="${p.image}">`:p.emoji||'🛍️'}</div>
+ <div class="info"><h3>${escHtml(p.name)}</h3><div><span class="price">${money(p.price)}</span><span class="old">${money(p.old)}</span></div>
+ <span class="stock">${p.stock>0?'স্টকে '+p.stock+'টি':'স্টক শেষ'}</span>
+ <button class="buy" ${p.stock<1?'disabled':''} onclick="addToCart(${p.id})">${p.stock?'কার্টে যোগ করুন':'স্টক শেষ'}</button></div></article>`).join(''):'<div class="empty">কোনো পণ্য পাওয়া যায়নি।</div>';
+}
+function filterCat(c){activeCat=c;render()}
+function esc(s){return String(s).replaceAll("'","&#39;")}
+function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function goShop(){document.getElementById('shop').scrollIntoView({behavior:'smooth'})}
+function toggleSearch(){document.getElementById('searchWrap').classList.toggle('hide');if(!document.getElementById('searchWrap').classList.contains('hide'))document.getElementById('search').focus()}
+function addToCart(id){const p=state.products.find(x=>x.id===id);if(!p||p.stock<1)return;const x=state.cart.find(x=>x.id===id);if(x&&x.qty<p.stock)x.qty++;else if(!x)state.cart.push({id,qty:1});save();updateCartCount();openCart()}
+function updateCartCount(){document.getElementById('cartCount').textContent=state.cart.reduce((s,x)=>s+x.qty,0)}
+function openCart(){drawCart();document.getElementById('cartModal').classList.remove('hide')}
+function drawCart(){
+ const items=state.cart.map((x,i)=>{const p=state.products.find(p=>p.id===x.id);return p?{...p,qty:x.qty,i}:null}).filter(Boolean);
+ const total=items.reduce((s,x)=>s+x.price*x.qty,0);
+ document.getElementById('cartItems').innerHTML=items.length?items.map(x=>`<div class="row"><div><b>${escHtml(x.name)}</b><br><span class="qty"><button onclick="changeQty(${x.i},-1)">−</button> ${x.qty} <button onclick="changeQty(${x.i},1)">+</button></span></div><b>${money(x.price*x.qty)}</b></div>`).join(''):'<div class="empty">আপনার কার্ট খালি।</div>';
+ document.getElementById('cartTotal').textContent=items.length?'মোট: '+money(total):'';
+ document.getElementById('checkout').innerHTML=items.length?`<div class="form"><h3>ডেলিভারি তথ্য</h3><input id="cName" placeholder="আপনার নাম"><input id="cPhone" placeholder="মোবাইল নম্বর"><textarea id="cAddress" placeholder="সম্পূর্ণ ডেলিভারি ঠিকানা"></textarea><div class="payBox"><div class="payMethod">💳 bKash / Nagad — Send Money</div><div class="sendLabel">পেমেন্টের ধরন: <b>Send Money</b></div><div class="copyRow"><input id="payNumber" value="01334966754" readonly><button type="button" class="copyBtn" onclick="copyPayNumber()">কপি</button></div><div class="sendLabel">উপরের নম্বরে <b>Send Money</b> করুন।</div><div class="minPay">সর্বনিম্ন Send Money: ৳150</div><input id="cTxn" placeholder="Transaction ID দিন"><input id="cPayAmount" type="number" min="150" placeholder="কত টাকা Send Money করেছেন?"></div><button class="primary" onclick="placeOrder()">পেমেন্ট করে অর্ডার কনফার্ম করুন</button></div>`:'';
+}
+function changeQty(i,n){const x=state.cart[i];const p=state.products.find(p=>p.id===x.id);x.qty+=n;if(x.qty>p.stock)x.qty=p.stock;if(x.qty<=0)state.cart.splice(i,1);save();drawCart();updateCartCount()}
+function placeOrder(){
+ const name=document.getElementById('cName').value.trim(),phone=document.getElementById('cPhone').value.trim(),address=document.getElementById('cAddress').value.trim(),txn=document.getElementById('cTxn').value.trim(),payAmount=Number(document.getElementById('cPayAmount').value||0);
+ if(!name||!phone||!address)return alert('নাম, ফোন ও সম্পূর্ণ ঠিকানা দিন।');
+ if(payAmount<150)return alert('নিরাপত্তার জন্য সর্বনিম্ন ৳150 Send Money করতে হবে।');
+ if(!txn)return alert('Send Money করার পর Transaction ID দিন।');
+ const items=state.cart.map(x=>{const p=state.products.find(p=>p.id===x.id);return {id:p.id,name:p.name,qty:x.qty,price:p.price}}),total=items.reduce((s,x)=>s+x.price*x.qty,0);
+ if(payAmount<total)return alert('অর্ডারের মোট মূল্য '+money(total)+'। অন্তত এই পরিমাণ Send Money করুন।');
+ items.forEach(x=>{const p=state.products.find(p=>p.id===x.id);p.stock-=x.qty});
+ const order={id:Date.now(),customerId,name,phone,address,payment:'bKash/Nagad — Send Money',paymentNumber:'01334966754',transactionId:txn,paymentAmount:payAmount,status:'Pending',total,items,date:new Date().toLocaleString('bn-BD')};
+ state.orders.unshift(order);state.cart=[];save();updateCartCount();closeModal('cartModal');alert('অর্ডার সফলভাবে জমা হয়েছে! Send Money যাচাই করে Admin কনফার্ম করবে। Order #'+order.id);openOrders();render();
+}
+
+async function copyPayNumber(){try{await navigator.clipboard.writeText('01334966754');alert('Send Money নম্বর কপি হয়েছে: 01334966754')}catch(e){const x=document.getElementById('payNumber');x.select();document.execCommand('copy');alert('Send Money নম্বর কপি হয়েছে: 01334966754')}}
+function openOrders(){renderOrders();document.getElementById('ordersModal').classList.remove('hide')}
+function renderOrders(){document.getElementById('orders').innerHTML=state.orders.length?state.orders.map(o=>`<div class="order"><b>Order #${o.id}</b><br>${o.date}<br><b>${money(o.total)}</b><br>স্ট্যাটাস: <b>${o.status}</b><br><small>${escHtml(o.address)}</small></div>`).join(''):'<div class="empty">এখনো কোনো অর্ডার নেই।</div>'}
+function closeModal(id){document.getElementById(id).classList.add('hide')}
+function openAdmin(){adminTab('dash');document.getElementById('adminModal').classList.remove('hide')}
+function adminTab(t){
+ ['dash','prod','ord'].forEach(x=>{document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('hide',x!==t);document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('on',x===t)});
+ if(t==='dash')drawDash();if(t==='prod')drawProd();if(t==='ord')drawAdminOrders();
+}
+function drawDash(){const revenue=state.orders.filter(o=>o.status!=='Cancelled').reduce((s,o)=>s+o.total,0);document.getElementById('adminDash').innerHTML=`<div class="stats"><div class="stat">পণ্য<h2>${state.products.length}</h2></div><div class="stat">অর্ডার<h2>${state.orders.length}</h2></div><div class="stat">Pending<h2>${state.orders.filter(o=>o.status==='Pending').length}</h2></div><div class="stat">বিক্রি<h2>${money(revenue)}</h2></div></div>`}
+function drawProd(){document.getElementById('adminProd').innerHTML=`<div class="adminBox"><h3>নতুন Product Add</h3><input id="pn" placeholder="Product name"><input id="pc" placeholder="Category"><input id="pp" type="number" placeholder="Selling price"><input id="po" type="number" placeholder="Old price"><input id="ps" type="number" placeholder="Stock"><input id="pe" placeholder="Emoji, যেমন ⌚"><label>১০–১২টি ছবি (সর্বোচ্চ ১২টি):</label><input id="pimgs" type="file" accept="image/*" multiple><label>Product video (ঐচ্ছিক, সর্বোচ্চ ৩MB):</label><input id="pvid" type="file" accept="video/*"><div class="fileNote">ছবিগুলো ছোট করে সংরক্ষণ করা হবে। ভিডিও বড় হলে যোগ নাও হতে পারে।</div><button onclick="addProduct()">Product Add</button></div>${state.products.map(p=>`<div class="adminBox"><b>${escHtml(p.name)}</b> — ${money(p.price)} — Stock ${p.stock}<br><span class="mediaCount">${p.images?.length||0}টি ছবি${p.video?' + ভিডিও':''}</span><br><button class="danger" onclick="deleteProduct(${p.id})">Delete</button></div>`).join('')}`}
+async function compressImage(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1280,s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.72))};img.onerror=reject;img.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+async function fileToDataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
+async function addProduct(){const name=pn.value.trim(),cat=pc.value.trim(),price=+pp.value,old=+po.value||price,stock=+ps.value,emoji=pe.value.trim()||'🛍️';if(!name||!cat||price<=0||stock<0)return alert('সব তথ্য সঠিকভাবে দিন।');const files=[...document.getElementById('pimgs').files].slice(0,12);if(files.length>12)return alert('সর্বোচ্চ ১২টি ছবি দেওয়া যাবে।');let images=[];try{for(const f of files)images.push(await compressImage(f));}catch(e){return alert('ছবি যোগ করা যায়নি। আবার চেষ্টা করুন।')}let video='';const vf=document.getElementById('pvid').files[0];if(vf){if(vf.size>3*1024*1024)return alert('ভিডিও সর্বোচ্চ ৩MB রাখুন।');try{video=await fileToDataUrl(vf)}catch(e){return alert('ভিডিও যোগ করা যায়নি।')}}state.products.unshift({id:Date.now(),name,cat,price,old,stock,emoji,images,video});save();render();drawProd();alert('Product সফলভাবে যোগ হয়েছে।');}
+function openProduct(id){const p=state.products.find(x=>x.id===id);if(!p)return;const imgs=p.images&&p.images.length?p.images:(p.image?[p.image]:[]);const modal=document.createElement('div');modal.className='modal';modal.id='productViewTemp';modal.innerHTML=`<div class="sheet"><button class="close" onclick="document.getElementById('productViewTemp').remove()">✕</button><h2>${escHtml(p.name)}</h2><div class="productMedia">${imgs[0]?`<img id="mainProductImage" src="${imgs[0]}">`:p.emoji||'🛍️'}${p.video?`<video controls playsinline src="${p.video}"></video>`:''}<div class="thumbRow">${imgs.map(x=>`<img src="${x}" onclick="document.getElementById('mainProductImage').src='${x}'">`).join('')}</div></div><p>${escHtml(p.cat)} · ${money(p.price)} ${p.old>p.price?`<span class="old">${money(p.old)}</span>`:''}</p><p class="stock">স্টক: ${p.stock}</p><button class="buy" onclick="addToCart(${p.id});document.getElementById('productViewTemp').remove()" ${p.stock<1?'disabled':''}>${p.stock<1?'স্টক শেষ':'কার্টে যোগ করুন'}</button></div>`;document.body.appendChild(modal)}
+
+function deleteProduct(id){if(!confirm('এই product delete করবেন?'))return;state.products=state.products.filter(p=>p.id!==id);state.cart=state.cart.filter(x=>x.id!==id);save();render();drawProd()}
+function drawAdminOrders(){document.getElementById('adminOrd').innerHTML=state.orders.length?state.orders.map(o=>`<div class="adminBox"><b>#${o.id}</b> — ${escHtml(o.name)} — ${money(o.total)}<br>📞 ${escHtml(o.phone)}<br>📍 ${escHtml(o.address)}<br>💳 ${escHtml(o.payment||'bKash/Nagad — Send Money')}<br>📱 Send Money: ${escHtml(o.paymentNumber||'01334966754')}<br>🧾 Transaction ID: <b>${escHtml(o.transactionId||'—')}</b><br>💰 পাঠানো: ${money(o.paymentAmount||0)}<select onchange="setOrderStatus(${o.id},this.value)">${['Pending','Confirmed','Processing','Shipped','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></div>`).join(''):'<div class="empty">কোনো অর্ডার নেই।</div>'}
+
+async function msgApi(url,opts={}){const r=await fetch(url,opts);const d=await r.json();if(!r.ok)throw Error(d.error||'মেসেজ সার্ভার সমস্যা');return d}
+function openMessages(){document.getElementById('messagesModal').classList.remove('hide');renderCustomerMessages()}
+async function renderCustomerMessages(){const box=document.getElementById('messageArea');try{const ms=await msgApi('/api/messages/'+customerId);box.innerHTML=`<div class="messageList">${ms.map(m=>`<div class="msg ${m.sender==='customer'?'mine':''}">${escHtml(m.text)}<small>${new Date(m.time).toLocaleString('bn-BD')}</small></div>`).join('')||'<div class="empty">এখনো কোনো মেসেজ নেই।</div>'}</div><div class="chatRow"><input id="customerMsg" placeholder="মেসেজ লিখুন..." onkeydown="if(event.key==='Enter')sendCustomerMessage()"><button onclick="sendCustomerMessage()">পাঠান</button></div>`;box.scrollTop=box.scrollHeight}catch(e){box.innerHTML='<div class="empty">মেসেজ চালাতে ওয়েবসাইটটি server/hosting-এ চালু থাকতে হবে।</div>'}}
+async function sendCustomerMessage(){const x=document.getElementById('customerMsg');if(!x||!x.value.trim())return;try{await msgApi('/api/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customerId,sender:'customer',text:x.value.trim()})});x.value='';renderCustomerMessages()}catch(e){alert(e.message)}}
+async function adminLoginForMessages(){const pin=prompt('Admin PIN দিন');if(!pin)return;try{await msgApi('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});window.mbAdminPin=pin;drawAdminMessages()}catch(e){alert(e.message)}}
+async function drawAdminMessages(){const box=document.getElementById('adminMsg');if(!window.mbAdminPin){box.innerHTML='<div class="adminBox"><h3>💬 Customer Messages</h3><p class="muted">Customer-দের মেসেজ দেখতে Admin PIN দিয়ে প্রবেশ করুন।</p><button onclick="adminLoginForMessages()">Message Center খুলুন</button></div>';return}try{const ids=await msgApi('/api/admin/customers',{headers:{'x-admin-pin':window.mbAdminPin}});box.innerHTML='<h3>💬 Message Center</h3>'+ (ids.length?ids.map(id=>`<div class="messageCard"><b>Customer ${escHtml(id.slice(0,10))}</b><br><button onclick="adminChat('${id}')">Chat খুলুন</button></div>`).join(''):'<div class="empty">এখনো কোনো Customer message নেই।</div>')}catch(e){box.innerHTML='<div class="empty">'+escHtml(e.message)+'</div>'}}
+async function adminChat(id){const ms=await msgApi('/api/admin/messages/'+id,{headers:{'x-admin-pin':window.mbAdminPin}});const box=document.getElementById('adminMsg');box.innerHTML=`<button onclick="drawAdminMessages()">← ফিরে যান</button><h3>💬 Customer Chat</h3><div id="adminChatBox" class="messageList">${ms.map(m=>`<div class="msg ${m.sender==='admin'?'mine':''}">${escHtml(m.text)}<small>${new Date(m.time).toLocaleString('bn-BD')}</small></div>`).join('')||'<div class="empty">কোনো মেসেজ নেই।</div>'}</div><div class="chatRow"><input id="adminMsgInput" placeholder="Customer-কে মেসেজ..." onkeydown="if(event.key==='Enter')sendAdminMessage('${id}')"><button onclick="sendAdminMessage('${id}')">পাঠান</button></div>`}
+async function sendAdminMessage(id){const x=document.getElementById('adminMsgInput');if(!x||!x.value.trim())return;try{await msgApi('/api/messages',{method:'POST',headers:{'Content-Type':'application/json','x-admin-pin':window.mbAdminPin},body:JSON.stringify({customerId:id,sender:'admin',text:x.value.trim(),pin:window.mbAdminPin})});x.value='';adminChat(id)}catch(e){alert(e.message)}}
+if(socket)socket.on('new_message',m=>{if(m.customerId===customerId&& !document.getElementById('messagesModal').classList.contains('hide'))renderCustomerMessages()});
+
+async function setOrderStatus(id,status){const o=state.orders.find(x=>x.id===id);if(o)o.status=status;save();drawAdminOrders();drawDash();if(status==='Confirmed'&&o?.customerId&&window.mbAdminPin){try{await msgApi('/api/admin/confirm-order',{method:'POST',headers:{'Content-Type':'application/json','x-admin-pin':window.mbAdminPin},body:JSON.stringify({customerId:o.customerId,orderId:o.id,total:o.total})})}catch(e){console.warn(e)}}}
+render();
+</script>
+</body>
+</html>
